@@ -1,0 +1,770 @@
+{% extends "layout.html" %}
+
+{% block title %}
+    Patient
+{% endblock %}
+
+{% block main %}
+
+  <h2> Patient <span id="patient_id">{{ data['social_history'][0]['id'] }}</span></h2>
+  <div class="accordion" id="accordionExample">
+      <div class="card">
+        <div class="card-header" id="heading1">
+          <h2 class="mb-0">
+            <button class="btn btn-link btn-block text-left" type="button" data-toggle="collapse" data-target="#collapse1" aria-expanded="true" aria-controls="collapse1">
+              Social history
+            </button>
+          </h2>
+        </div>
+
+        <div id="collapse1" class="collapse show" aria-labelledby="heading1" data-parent="#accordionExample">
+          <div class="card-body">
+            <div class="d-flex justify-content-center">
+               <table class="table table-responsive table-hover patient_table mx-auto w-auto" id="social_history_table">
+                 <tr>
+                   <td> Full name: </td>
+                   <td> {{data['social_history'][0]['full_name']}}</td>
+                 </tr>
+                 <tr>
+                   <td> Gender: </td>
+                   <td> {{data['social_history'][0]['gender']}}</td>
+                 </tr>
+                 <tr>
+                   <td> Age: </td>
+                   <td> {{data['social_history'][0]['age']}}</td>
+                 </tr>
+                   <tr>
+                   <td> Passport number: </td>
+                    <td> {{data['social_history'][0]['passport_number']}}</td>
+                 </tr>
+                 <tr>
+                   <td> Address: </td>
+                   <td> {{data['social_history'][0]['address']}}</td>
+                 </tr>
+                 <tr>
+                   <td> Religion: </td>
+                   <td> {{data['social_history'][0]['religion']}}</td>
+                 </tr>
+                 <tr>
+                   <td> Occupation: </td>
+                   <td> {{data['social_history'][0]['occupation']}}</td>
+                 </tr>
+                 <tr>
+                   <td> Race: </td>
+                   <td> {{data['social_history'][0]['race']}}</td>
+                 </tr>
+                 <tr>
+                   <td> Full name: </td>
+                   <td> {{data['social_history'][0]['nationality']}}</td>
+                 </tr>
+               </table>
+            </div>
+          </div>
+        </div>
+      </div>
+
+       <div class="card">
+        <div class="card-header" id="heading7">
+          <h2 class="mb-0">
+            <button class="btn btn-link btn-block text-left collapsed" type="button" data-toggle="collapse" data-target="#collapse7" aria-expanded="false" aria-controls="collapse7">
+              Family history
+            </button>
+          </h2>
+        </div>
+        <div id="collapse7" class="collapse" aria-labelledby="heading7" data-parent="#accordionExample">
+          <div class="card-body">
+              {% if data['family_history']|length == 0 %}
+                <div class="d-flex justify-content-center">
+                  <p> No data of family history</p>
+                </div>
+              {% else %}
+                <div class="d-flex justify-content-center">
+                <table class="table table-responsive table-hover patient_table mx-auto w-auto" id="family_history_table">
+                  <thead>
+                    <tr>
+                      <th>Id</th>
+                      <th>Name</th>
+                      <th>Status</th>
+                      <th>Gender</th>
+                      <th>Age</th>
+                      <th>Allergies</th>
+                      <th>Diseases</th>
+                      <th>Cause of death</th>
+                    </tr>
+                  </thead>
+                {% for i in range(data['family_history']|length) %}
+                  <tr>
+                    <td>{{ data['family_history'][i]['id'] }}</td>
+                    <td>{{ data['family_history'][i]['full_name'] }}</td>
+                    <td>{{ data['family_history'][i]['relative_status'] }}</td>
+                    <td>{{ data['family_history'][i]['gender'] }}</td>
+                    <td>{{ data['family_history'][i]['age'] }}</td>
+                    <td>{{ data['family_history'][i]['allergies'] }}</td>
+                    <td>{{ data['family_history'][i]['diseases'] }}</td>
+                    <td>{{ data['family_history'][i]['cause_of_death'] }}</td>
+                  </tr>
+                {% endfor %}
+                </table>
+                </div>
+              {% endif %}
+              <a href="/family_history">Add relative</a>
+          </div>
+        </div>
+      </div>
+
+       <div class="card">
+        <div class="card-header" id="heading8">
+          <h2 class="mb-0">
+            <button class="btn btn-link btn-block text-left collapsed" type="button" data-toggle="collapse" data-target="#collapse8" aria-expanded="false" aria-controls="collapse8">
+             Habits
+            </button>
+          </h2>
+        </div>
+        <div id="collapse8" class="collapse" aria-labelledby="heading8" data-parent="#accordionExample">
+          <div class="card-body">
+            {% if data['habits']|length == 0 %}
+              <p> No data of habits</p>
+            {% else %}
+                 <div class="d-flex justify-content-center">
+                   <table class="table table-responsive table-hover patient_table mx-auto w-auto" id="habits_table">
+                     <thead>
+                       <tr>
+                         <th>Id</th>
+                         <th>Name</th>
+                         <th>Year</th>
+                       </tr>
+                     </thead>
+                      {% for i in range(data['habits']|length) %}
+                        <tr>
+                          <td>{{ data['habits'][i]['id'] }}</td>
+                          <td>{{ data['habits'][i]['name'] }}</td>
+                          <td>{{ data['habits'][i]['year'] }}</td>
+                        </tr>
+                      {% endfor %}
+                   </table>
+                 </div>
+            {% endif %}
+            <a href="/habits">Add habit</a>
+          </div>
+        </div>
+      </div>
+
+       <div class="card">
+        <div class="card-header" id="heading4">
+          <h2 class="mb-0">
+            <button class="btn btn-link btn-block text-left collapsed" type="button" data-toggle="collapse" data-target="#collapse4" aria-expanded="false" aria-controls="collapse4">
+              Diseases
+            </button>
+          </h2>
+        </div>
+        <div id="collapse4" class="collapse" aria-labelledby="heading4" data-parent="#accordionExample">
+          <div class="card-body">
+             {% if data['diseases']|length == 0 %}
+              <p> No data of diseases</p>
+            {% else %}
+                 <div class="d-flex justify-content-center">
+                   <table class="table table-responsive table-hover patient_table mx-auto w-auto" id="diseases_table">
+                     <thead>
+                       <tr>
+                         <th>Id</th>
+                         <th>Name</th>
+                         <th>Description</th>
+                         <th>Date</th>
+                         <th>End of treatment</th>
+                         <th>Doctor id</th>
+                         <th>Medication id</th>
+                       </tr>
+                     </thead>
+                      {% for i in range(data['diseases']|length) %}
+                        <tr>
+                          <td>{{ data['diseases'][i]['id'] }}</td>
+                          <td>{{ data['diseases'][i]['name'] }}</td>
+                          <td>{{ data['diseases'][i]['description'] }}</td>
+                          <td>{{ data['diseases'][i]['date'] }}</td>
+                          <td>{{ data['diseases'][i]['end_of_treatment'] }}</td>
+                          <td>{{ data['diseases'][i]['doctor_id'] }}</td>
+                          <td>{{ data['diseases'][i]['medication_id'] }}</td>
+                        </tr>
+                      {% endfor %}
+                   </table>
+                 </div>
+            {% endif %}
+            <a href="/diseases">Add disease</a>
+          </div>
+        </div>
+      </div>
+
+       <div class="card">
+        <div class="card-header" id="heading5">
+          <h2 class="mb-0">
+            <button class="btn btn-link btn-block text-left collapsed" type="button" data-toggle="collapse" data-target="#collapse5" aria-expanded="false" aria-controls="collapse5">
+              Allergies
+            </button>
+          </h2>
+        </div>
+        <div id="collapse5" class="collapse" aria-labelledby="heading5" data-parent="#accordionExample">
+          <div class="card-body">
+            {% if data['allergies']|length == 0 %}
+              <p> No data of allergies</p>
+            {% else %}
+                 <div class="d-flex justify-content-center">
+                   <table class="table table-responsive table-hover patient_table mx-auto w-auto" id="allergies_table">
+                     <thead>
+                       <tr>
+                         <th>Id</th>
+                         <th>Name</th>
+                         <th>Description</th>
+                         <th>Date</th>
+                         <th>End of treatment</th>
+                         <th>Doctor id</th>
+                         <th>Medication id</th>
+                       </tr>
+                     </thead>
+                      {% for i in range(data['allergies']|length) %}
+                        <tr>
+                          <td>{{ data['allergies'][i]['id'] }}</td>
+                          <td>{{ data['allergies'][i]['name'] }}</td>
+                          <td>{{ data['allergies'][i]['description'] }}</td>
+                          <td>{{ data['allergies'][i]['date'] }}</td>
+                          <td>{{ data['allergies'][i]['end_of_treatment'] }}</td>
+                          <td>{{ data['allergies'][i]['doctor_id'] }}</td>
+                          <td>{{ data['allergies'][i]['medication_id'] }}</td>
+                        </tr>
+                      {% endfor %}
+                   </table>
+                 </div>
+            {% endif %}
+            <a href="/allergies">Add allergy</a>
+          </div>
+        </div>
+      </div>
+
+       <div class="card">
+        <div class="card-header" id="heading2">
+          <h2 class="mb-0">
+            <button class="btn btn-link btn-block text-left collapsed" type="button" data-toggle="collapse" data-target="#collapse2" aria-expanded="false" aria-controls="collapse2">
+              Surgical history
+            </button>
+          </h2>
+        </div>
+        <div id="collapse2" class="collapse" aria-labelledby="heading2" data-parent="#accordionExample">
+          <div class="card-body">
+            {% if data['surgical_history']|length == 0 %}
+              <p> No data of surgical operations</p>
+            {% else %}
+                 <div class="d-flex justify-content-center">
+                   <table class="table table-responsive table-hover patient_table mx-auto w-auto" id="surgical_history_table">
+                     <thead>
+                       <tr>
+                         <th>Id</th>
+                         <th>Name</th>
+                         <th>Description</th>
+                         <th>Date</th>
+                         <th>Preoperative diagnosis</th>
+                         <th>Postoperative diagnosis</th>
+                         <th>Condition after surgery</th>
+                         <th>Doctor id</th>
+                       </tr>
+                     </thead>
+                      {% for i in range(data['surgical_history']|length) %}
+                        <tr>
+                          <td>{{ data['surgical_history'][i]['id'] }}</td>
+                          <td>{{ data['surgical_history'][i]['operation_name'] }}</td>
+                          <td>{{ data['surgical_history'][i]['description'] }}</td>
+                          <td>{{ data['surgical_history'][i]['date'] }}</td>
+                          <td>{{ data['surgical_history'][i]['preoperative_diagnosis'] }}</td>
+                          <td>{{ data['surgical_history'][i]['postoperative_diagnosis'] }}</td>
+                          <td>{{ data['surgical_history'][i]['condition_after_surgery'] }}</td>
+                          <td>{{ data['surgical_history'][i]['doctor_id'] }}</td>
+                        </tr>
+                      {% endfor %}
+                   </table>
+                 </div>
+            {% endif %}
+            <a href="/surgical_history">Add surgery</a>
+          </div>
+        </div>
+      </div>
+
+       <div class="card">
+        <div class="card-header" id="heading9">
+          <h2 class="mb-0">
+            <button class="btn btn-link btn-block text-left collapsed" type="button" data-toggle="collapse" data-target="#collapse9" aria-expanded="false" aria-controls="collapse9">
+              Immunonization history
+            </button>
+          </h2>
+        </div>
+        <div id="collapse9" class="collapse" aria-labelledby="heading9" data-parent="#accordionExample">
+          <div class="card-body">
+              {% if data['immunization_history']|length == 0 %}
+                <div class="d-flex justify-content-center">
+                  <p>No data of immunizations</p>
+                </div>
+              {% else %}
+                <div class="d-flex justify-content-center">
+                <table class="table table-responsive table-hover patient_table mx-auto w-auto" id="immunization_history_table">
+                  <thead>
+                    <tr>
+                      <th>Id</th>
+                      <th>Name</th>
+                      <th>Date</th>
+                      <th>Medication id</th>
+                    </tr>
+                  </thead>
+                {% for i in range(data['immunization_history']|length) %}
+                  <tr>
+                    <td>{{ data['immunization_history'][i]['id'] }}</td>
+                    <td>{{ data['immunization_history'][i]['name'] }}</td>
+                    <td>{{ data['immunization_history'][i]['date'] }}</td>
+                    <td>{{ data['immunization_history'][i]['medication_id'] }}</td>
+                  </tr>
+                {% endfor %}
+                </table>
+                </div>
+              {% endif %}
+            <a href="/immunization_history">Add immunization</a>
+          </div>
+        </div>
+      </div>
+
+       <div class="card">
+        <div class="card-header" id="heading11">
+          <h2 class="mb-0">
+            <button class="btn btn-link btn-block text-left collapsed" type="button" data-toggle="collapse" data-target="#collapse11" aria-expanded="false" aria-controls="collapse11">
+              Test results
+            </button>
+          </h2>
+        </div>
+        <div id="collapse11" class="collapse" aria-labelledby="heading11" data-parent="#accordionExample">
+          <div class="card-body">
+            {% if data['tests_results']|length == 0 %}
+              <p>No data of tests results</p>
+            {% else %}
+                 <div class="d-flex justify-content-center">
+                   <table class="table table-responsive table-hover patient_table mx-auto w-auto" id="tests_results_table">
+                     <thead>
+                       <tr>
+                         <th>Id</th>
+                         <th>Name</th>
+                         <th>Date</th>
+                         <th>Result</th>
+                       </tr>
+                     </thead>
+                      {% for i in range(data['tests_results']|length) %}
+                        <tr>
+                          <td>{{ data['tests_results'][i]['id'] }}</td>
+                          <td>{{ data['tests_results'][i]['name'] }}</td>
+                          <td>{{ data['tests_results'][i]['date'] }}</td>
+                          <td>{{ data['tests_results'][i]['result_description'] }}</td>
+                        </tr>
+                      {% endfor %}
+                   </table>
+                 </div>
+            {% endif %}
+            <a href="/tests_results">Add test</a>
+          </div>
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="card-header" id="heading6">
+          <h2 class="mb-0">
+            <button class="btn btn-link btn-block text-left collapsed" type="button" data-toggle="collapse" data-target="#collapse6" aria-expanded="false" aria-controls="collapse6">
+             Medications
+            </button>
+          </h2>
+        </div>
+        <div id="collapse6" class="collapse" aria-labelledby="heading6" data-parent="#accordionExample">
+          <div class="card-body">
+            {% if data['medications_diseases']|length == 0 %}
+              <p>No data of medications for diseases</p>
+            {% else %}
+                 <div class="d-flex justify-content-center">
+                   <table class="table table-responsive table-hover patient_table mx-auto w-auto" id="medications_diseases_table">
+                     <thead>
+                       <tr>
+                         <th>Disease Id</th>
+                         <th>Disease Name</th>
+                         <th>Medication Id</th>
+                         <th>Medication Name</th>
+                         <th>Medication Description</th>
+                         <th>Medication dosage</th>
+                       </tr>
+                     </thead>
+                      {% for i in range(data['medications_diseases']|length) %}
+                        <tr>
+                          <td>{{ data['medications_diseases'][i]['id'] }}</td>
+                          <td>{{ data['medications_diseases'][i]['disease_name'] }}</td>
+                          <td>{{ data['medications_diseases'][i]['medication_id'] }}</td>
+                          <td>{{ data['medications_diseases'][i]['medication_name'] }}</td>
+                          <td>{{ data['medications_diseases'][i]['medication_description'] }}</td>
+                          <td>{{ data['medications_diseases'][i]['dosage'] }}</td>
+                        </tr>
+                      {% endfor %}
+                   </table>
+                 </div>
+            {% endif %}
+
+            {% if data['medications_allergies']|length == 0 %}
+              <p>No data of medications for allergies</p>
+            {% else %}
+                 <div class="d-flex justify-content-center">
+                   <table class="table table-responsive table-hover patient_table" id="medications_allergies_table">
+                     <thead>
+                       <tr>
+                         <th>Allergy Id</th>
+                         <th>Allergy Name</th>
+                         <th>Medication Id</th>
+                         <th>Medication Name</th>
+                         <th>Medication Description</th>
+                         <th>Medication dosage</th>
+                       </tr>
+                     </thead>
+                      {% for i in range(data['medications_allergies']|length) %}
+                        <tr>
+                          <td>{{ data['medications_allergies'][i]['id'] }}</td>
+                          <td>{{ data['medications_allergies'][i]['allergy_name'] }}</td>
+                          <td>{{ data['medications_allergies'][i]['medication_id'] }}</td>
+                          <td>{{ data['medications_allergies'][i]['medication_name'] }}</td>
+                          <td>{{ data['medications_allergies'][i]['medication_description'] }}</td>
+                          <td>{{ data['medications_allergies'][i]['dosage'] }}</td>
+                        </tr>
+                      {% endfor %}
+                   </table>
+                 </div>
+            {% endif %}
+
+            {% if data['medications_immunization']|length == 0 %}
+              <p>No data of medications for immunization</p>
+            {% else %}
+               <div class="d-flex justify-content-center">
+                 <table class="table table-responsive table-hover patient_table" id="medications_immunization_table">
+                   <thead>
+                     <tr>
+                       <th>Immunization Id</th>
+                       <th>Immunization Name</th>
+                       <th>Medication Id</th>
+                       <th>Medication Name</th>
+                       <th>Medication Description</th>
+                     </tr>
+                   </thead>
+                    {% for i in range(data['medications_immunization']|length) %}
+                      <tr>
+                        <td>{{ data['medications_immunization'][i]['id'] }}</td>
+                        <td>{{ data['medications_immunization'][i]['immunization_name'] }}</td>
+                        <td>{{ data['medications_immunization'][i]['medication_id'] }}</td>
+                        <td>{{ data['medications_immunization'][i]['medication_name'] }}</td>
+                        <td>{{ data['medications_immunization'][i]['medication_description'] }}</td>
+                      </tr>
+                    {% endfor %}
+                 </table>
+                 </div>
+            {% endif %}
+          </div>
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="card-header" id="heading10">
+          <h2 class="mb-0">
+            <button class="btn btn-link btn-block text-left collapsed" type="button" data-toggle="collapse" data-target="#collapse10" aria-expanded="false" aria-controls="collapse10">
+              Medical encounters
+            </button>
+          </h2>
+        </div>
+        <div id="collapse10" class="collapse" aria-labelledby="heading10" data-parent="#accordionExample">
+          <div class="card-body">
+           {% if data['encounters']|length == 0 %}
+              <p>No encounters yet</p>
+            {% else %}
+               <div class="d-flex justify-content-center">
+                 <table class="table table-responsive table-hover patient_table mx-auto w-auto" id="encounters_table">
+                   <thead>
+                     <tr>
+                       <th>Encounter Id</th>
+                       <th>Date</th>
+                       <th>Chief complaint</th>
+                       <th>History of illness</th>
+                       <th>Examination</th>
+                       <th>Assessment and plan</th>
+                       <th>Doctor id</th>
+                       <th>Delete</th>
+                       <th>Edit</th>
+                     </tr>
+                   </thead>
+                    {% for i in range(data['encounters']|length) %}
+                      <tr>
+                        <td class="encounters_id">{{ data['encounters'][i]['id'] }}</td>
+                        <td class="encounters_date">{{ data['encounters'][i]['date'] }}</td>
+                        <td class="chief_complaint"><span>{{ data['encounters'][i]['chief_complaint'] }}</span></td>
+                        <td class="history_of_illness"><span>{{ data['encounters'][i]['history_of_illness'] }}</span></td>
+                        <td class="examination"><span>{{ data['encounters'][i]['examination'] }}</span></td>
+                        <td class="assessment_and_plan"><span>{{ data['encounters'][i]['assessment_and_plan'] }}</span></td>
+                        <td class="doctor_id">{{ data['encounters'][i]['doctor_id'] }}</td>
+                        <td>
+                          <button type="button" class="btn btn-danger delete_button" data-toggle="modal" data-target="#update_encounter_modal">Delete</button>
+                        </td>
+                        <td class="edit">
+                          <button type="button" class="btn btn-success table_button edit_button">Edit</button>
+                        </td>
+                      </tr>
+                    {% endfor %}
+                 </table>
+                </div>
+            {% endif %}
+              <a href="/encounters">Add encounter</a>
+          </div>
+        </div>
+      </div>
+
+  </div>
+  <!-- End of accordeon -->
+
+    <!---- Delete ------>
+    <!-- Button trigger modal -->
+    <button type="button" class="btn btn-primary" data-toggle="modal" data-target="#update_encounter_modal" id="modal_warning_update_encounter">
+      Launch
+    </button>
+
+    <!-- Modal -->
+    <div class="modal fade" id="update_encounter_modal" tabindex="-1" aria-labelledby="update_encounter_modal" aria-hidden="true">
+      <div class="modal-dialog">
+        <div class="modal-content">
+          <div class="modal-header">
+            <h5 class="modal-title" id="update_encounter_modal_label">Warning</h5>
+            <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+              <span aria-hidden="true">&times;</span>
+            </button>
+          </div>
+          <div class="modal-body">
+            <ul id="patient_info_message"></ul>
+            <div id="deletion_confirmation">
+              <h2>Are you sure you want to delete this encounter?</h2>
+              <button class="btn btn-danger" id="confirm_deletion_button">Yes</button>
+              <button type="button" data-dismiss="modal" aria-label="Close" class="btn btn-secondary" id="cancel_deletion_button">No</button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <!-- End -->
+
+     <!-- Scripts -->
+    <script src="https://code.jquery.com/jquery-3.3.1.min.js"></script>
+    <script>
+      /************* Delete ******************/
+      let deletion_confirmed = false;
+      let row = null;
+      let encounter_id = null;
+      let doctor_id = null;
+      let patient_id = null;
+      let data = {};
+
+      document.querySelector("#encounters_table").addEventListener("click", (event)=> {
+        if (event.target.className == "btn btn-danger delete_button") {
+          document.querySelector("#patient_info_message").innerHTML = "";
+          document.querySelector("#deletion_confirmation").style.display = "block";
+
+          row = event.target.parentNode.parentNode;
+          encounter_id = row.childNodes[1].textContent;
+          doctor_id = row.querySelector(".doctor_id").textContent;
+          patient_id = document.querySelector("#patient_id").textContent;
+          data = {
+            "encounter_id": encounter_id,
+            "doctor_id": doctor_id
+          };
+        }
+      });
+
+      document.querySelector("#confirm_deletion_button").addEventListener("click", ()=> {
+           $.ajax({
+              type: "DELETE",
+              url: "/patient" + "/" + patient_id,
+              data: JSON.stringify(data),
+              contentType: "application/json",
+              dataType: 'json',
+              success: function(response) {
+                // When a user tries to delete an encounter created by other user
+                // They are not allowed to do it
+                if (response === "You can't delete encounters that are not created by you!") {
+                  document.querySelector("#deletion_confirmation").style.display = "none";
+                  document.querySelector("#patient_info_message").innerHTML += `<li class="red">You can't delete encounters that are not created by you!</li>`;
+                }
+
+                // When a user tries to delete an encounter made by themselves
+                // They are allowed to do it
+                if (response['encounter_id'] !== undefined) {
+                  row.remove();
+                  document.querySelector("#modal_warning_update_encounter").click();
+                }
+              }
+            });
+        });
+
+        /********** Update ***************/
+        document.querySelector("#encounters_table").addEventListener("click", (event)=> {
+          const row = event.target.parentNode.parentNode;
+          const doctor_id = row.querySelector(".doctor_id").textContent;
+
+          const chief_complaint_column = row.querySelector(".chief_complaint");
+          const chief_complaint_value = chief_complaint_column.textContent;
+
+          const history_of_illness_column = row.querySelector(".history_of_illness");
+          const history_of_illness_value = history_of_illness_column.textContent;
+
+          const examination_column = row.querySelector(".examination");
+          const examination_value = examination_column.textContent;
+
+          const assessment_and_plan_column = row.querySelector(".assessment_and_plan");
+          const assessment_and_plan_value = assessment_and_plan_column.textContent;
+
+          // edit button
+          if (event.target.className == "btn btn-success table_button edit_button") {
+              // create input and hide column value
+              if (chief_complaint_column.querySelector("input") == null) {
+                chief_complaint_column.innerHTML += `<input value=${chief_complaint_value} class="chief_complaint_new_input">`;
+              }
+              const chief_complaint_span = chief_complaint_column.querySelector('span');
+              chief_complaint_span.style.display = "none";
+
+              if (history_of_illness_column.querySelector("input") == null) {
+                history_of_illness_column.innerHTML += `<input value=${history_of_illness_value} class="history_of_illness_new_input">`;
+              }
+              const history_of_illness_span = history_of_illness_column.querySelector('span');
+              history_of_illness_span.style.display = "none";
+
+              if (examination_column.querySelector("input") == null) {
+                examination_column.innerHTML += `<input value=${examination_value} class="examination_new_input">`;
+              }
+              const examination_span = examination_column.querySelector('span');
+              examination_span.style.display = "none";
+
+              if (assessment_and_plan_column.querySelector("input") == null) {
+                 assessment_and_plan_column.innerHTML += `<input value=${assessment_and_plan_value} class="assessment_and_plan_new_input">`;
+              }
+              const assessment_and_plan_span = assessment_and_plan_column.querySelector('span');
+              assessment_and_plan_span.style.display = "none";
+
+              // buttons
+              if (row.querySelector(".edit").childNodes[3]== undefined) {
+                row.querySelector(".edit").innerHTML += "<button class='btn btn-warning submit_edit_button table_button'>Submit</button>";
+              }
+
+              if (row.querySelector(".edit").childNodes[4]== undefined) {
+                row.querySelector(".edit").innerHTML += "<button class='btn btn-secondary cancel_submition_button'>Cancel</button>";
+              }
+
+              row.querySelector(".edit_button").remove();
+          }
+
+          // Cancel button
+          if (event.target.className == "btn btn-secondary cancel_submition_button") {
+              chief_complaint_column.innerHTML = `<span>${chief_complaint_value}</span>`;
+              history_of_illness_column.innerHTML = `<span>${history_of_illness_value}</span>`;
+              examination_column.innerHTML = `<span>${examination_value}</span>`;
+              assessment_and_plan_column.innerHTML = `<span>${assessment_and_plan_value}</span>`;
+
+              // buttons
+              row.querySelector(".submit_edit_button").remove();
+              row.querySelector(".cancel_submition_button").remove();
+              row.querySelector(".edit").innerHTML += '<button type="button" class="btn btn-success table_button edit_button">Edit</button>';
+          }
+
+          // Submit button
+          if (event.target.className == "btn btn-warning submit_edit_button table_button") {
+            const patient_id = document.querySelector("#patient_id").textContent;
+            const encounter_id = row.querySelector(".encounters_id").textContent;
+            const doctor_id = row.querySelector(".doctor_id").textContent;
+            document.querySelector("#patient_info_message").innerHTML = "";
+
+            // Check for empty fileds
+            if (row.querySelector(".chief_complaint_new_input").value.length === 0) {
+                document.querySelector("#deletion_confirmation").style.display = "none";
+                document.querySelector("#patient_info_message").innerHTML += `<li class="red">Chief complaint value must not be empty!</li>`;
+                document.querySelector("#modal_warning_update_encounter").click();
+                return 0;
+            }
+
+            if (row.querySelector(".history_of_illness_new_input").value.length === 0) {
+                document.querySelector("#deletion_confirmation").style.display = "none";
+                document.querySelector("#patient_info_message").innerHTML += `<li class="red">History of illness value must not be empty!</li>`;
+                document.querySelector("#modal_warning_update_encounter").click();
+                return 0;
+            }
+
+            if (row.querySelector(".examination_new_input").value.length === 0) {
+                document.querySelector("#deletion_confirmation").style.display = "none";
+                document.querySelector("#patient_info_message").innerHTML += `<li class="red">Examination of illness value must not be empty!</li>`;
+                document.querySelector("#modal_warning_update_encounter").click();
+                return 0;
+            }
+
+            if (row.querySelector(".assessment_and_plan_new_input").value.length === 0) {
+                document.querySelector("#deletion_confirmation").style.display = "none";
+                document.querySelector("#patient_info_message").innerHTML += `<li class="red">Assessment and plan value must not be empty!</li>`;
+                document.querySelector("#modal_warning_update_encounter").click();
+                return 0;
+            }
+
+            // If there are no empty fields, proceed with an AJAX request to a server
+            const data = {
+              "chief_complaint_new_input": row.querySelector(".chief_complaint_new_input").value,
+              "history_of_illness_new_input": row.querySelector(".history_of_illness_new_input").value,
+              "examination_new_input": row.querySelector(".examination_new_input").value,
+              "assessment_and_plan_new_input": row.querySelector(".assessment_and_plan_new_input").value,
+              "encounter_id": encounter_id,
+              "doctor_id": doctor_id
+            };
+
+             $.ajax({
+              type: "PUT",
+              url: "/patient" + "/" + patient_id,
+              data: JSON.stringify(data),
+              contentType: "application/json",
+              dataType: 'json',
+              success: function(response) {
+                // When a user tries to edit an encounter created by other user
+                // They are not allowed to do it
+                if (response === "You can't edit encounters that are not created by you!") {
+                  document.querySelector("#deletion_confirmation").style.display = "none";
+                  document.querySelector("#patient_info_message").innerHTML = `<li class="red">You can't edit encounters that are not created by you!</li>`;
+                  document.querySelector("#modal_warning_update_encounter").click();
+                }
+
+                // When a user tries to edit an encounter made by themselves
+                // They are allowed to do it
+                if (response['encounter_id'] !== undefined) {
+                  // Update columns values
+                  const chief_complaint_span = chief_complaint_column.querySelector('span');
+                  chief_complaint_span.textContent = response['edited_encounter'][0]['chief_complaint'];
+                  chief_complaint_span.style.display = "block";
+                  const chief_complaint_input = chief_complaint_column.querySelector('input');
+                  chief_complaint_input.remove();
+
+                  const history_of_illness_span = history_of_illness_column.querySelector('span');
+                  history_of_illness_span.textContent = response['edited_encounter'][0]['history_of_illness'];
+                  history_of_illness_span.style.display = "block";
+                  const history_of_illness_input = history_of_illness_column.querySelector('input');
+                  history_of_illness_input.remove();
+
+                  const examination_span = examination_column.querySelector('span');
+                  examination_span.textContent = response['edited_encounter'][0]['examination'];
+                  examination_span.style.display = "block";
+                  const examination_input = examination_column.querySelector('input');
+                  examination_input.remove();
+
+                  const assessment_and_plan_span = assessment_and_plan_column.querySelector('span');
+                  assessment_and_plan_span.textContent = response['edited_encounter'][0]['assessment_and_plan'];
+                  assessment_and_plan_span.style.display = "block";
+                  const assessment_and_plan_input = assessment_and_plan_column.querySelector('input');
+                  assessment_and_plan_input.remove();
+
+                  // Show the edit button and remove other buttons
+                  row.querySelector(".edit").innerHTML = '<button type="button" class="btn btn-success table_button edit_button">Edit</button>';
+                }
+              }
+            });
+          }
+      });
+    </script>
+{% endblock %}

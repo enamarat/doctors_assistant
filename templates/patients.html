@@ -1,0 +1,36 @@
+{% extends "layout.html" %}
+
+{% block title %}
+    Log In
+{% endblock %}
+
+{% block main %}
+  <h3 class="greeting"> Welcome, {{fullname[0]['full_name']}}!</h3>
+  <h2> Your encounters </h2>
+
+  {% if data|length == 0 %}
+    <p> No encounters yet</p>
+  {% else %}
+  <div class="d-flex justify-content-center">
+    <table class="table table-responsive table-hover patient_table mx-auto w-auto" id="found_doctors_table">
+         <thead>
+            <tr>
+              <th>Encounter id</th>
+              <th>Date</th>
+              <th>Chief complaint</th>
+              <th>Patient id</th>
+            </tr>
+          </thead>
+        {% for i in range(data|length) %}
+          <tr>
+            <td>{{ data[i]['id'] }}</td>
+            <td>{{ data[i]['date'] }}</td>
+            <td>{{ data[i]['chief_complaint'] }}</td>
+            <td><a href = "{{'/patient/%s'%data[i]['patient_id']}}" class="red">{{ data[i]['patient_id'] }}</a></td>
+          </tr>
+        {% endfor %}
+    </table>
+  </div>
+  {% endif %}
+
+{% endblock %}

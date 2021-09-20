@@ -1,0 +1,85 @@
+{% extends "layout.html" %}
+
+{% block title %}
+    Log In
+{% endblock %}
+
+{% block main %}
+  <div class="d-flex justify-content-flex-start">
+    <div class="shifted-left">
+      <h3> patient: {{patient_fullname}}</h3>
+      <h3> id: {{patient_id}}</h3>
+    </div>
+  </div>
+  <h2> Family history </h2>
+
+    <div class="d-flex justify-content-center">
+        <form action="/family_history" method="post" id="family_history_form" class="patient_form">
+           <div class="form-group">
+              <input autocomplete="off" autofocus class="form-control" name="relative_name" placeholder="relative full name" type="text" id="relative_name">
+            </div>
+           <div class="form-group">
+              <textarea autocomplete="off" autofocus class="form-control" name="relative_status" placeholder="relative status (father, etc.)" type="text" id="relative_status"></textarea>
+            </div>
+             <div class="form-group">
+              <label for="gender">Gender</label>
+              <select name="relative_gender" id="relative_gender">
+                  <option value="male">male</option>
+                  <option value="female">female</option>
+              </select>
+             </div>
+           <div class="form-group">
+              <input autocomplete="off" autofocus class="form-control" name="relative_age" placeholder="relative age" type="number" id="relative_age">
+           </div>
+           <div class="form-group">
+             <div class="d-flex justify-content-flex-start">
+               <textarea autocomplete="off" autofocus class="form-control" name="relative_diseases" placeholder="relative diseases" type="text" id="relative_diseases"></textarea><label>*</label>
+             </div>
+           </div>
+           <div class="form-group">
+             <div class="d-flex justify-content-flex-start">
+               <textarea autocomplete="off" autofocus class="form-control" name="relative_allergies" placeholder="relative allergies" type="text" id="reltive_allergies"></textarea><label>*</label>
+             </div>
+           </div>
+           <div class="form-group">
+             <div class="d-flex justify-content-flex-start">
+               <textarea autocomplete="off" autofocus class="form-control" name="relative_cause_of_death" placeholder="cause of death" type="text" id="relative_cause_of_death"></textarea><label>*</label>
+             </div>
+           </div>
+           <div>
+             <label>* - optional</label>
+           </div>
+           <button class="btn btn-primary client_form_button" type="submit" id="family_history_button">Submit</button>
+        </form>
+    </div>
+    <div class="skip">
+      <a href="/habits">Skip</a>
+    </div>
+    <div class="skip">
+      <a href= "{{'/patient/%s'%patient_id}}">To patient's page</a>
+    </div>
+
+    <!-- Modal window warning -->
+         <!-- Button trigger modal -->
+    <button type="button" class="btn btn-primary" data-toggle="modal" data-target="#family_history_warning" id="modal_warning_family_history">
+      Launch
+    </button>
+
+    <!-- Modal -->
+    <div class="modal fade" id="family_history_warning" tabindex="-1" aria-labelledby="family_history_warning" aria-hidden="true">
+      <div class="modal-dialog">
+        <div class="modal-content">
+          <div class="modal-header">
+            <h5 class="modal-title" id="family_history_warning_label">Warning</h5>
+            <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+              <span aria-hidden="true">&times;</span>
+            </button>
+          </div>
+          <div class="modal-body">
+            <ul id="family_history_message"></ul>
+          </div>
+        </div>
+      </div>
+    </div>
+    <!-- End -->
+{% endblock %}

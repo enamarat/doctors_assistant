@@ -1,0 +1,25 @@
+{% extends "layout.html" %}
+
+{% block title %}
+    Find Doctor
+{% endblock %}
+
+{% block main %}
+
+  <h2> Find doctor </h2>
+   <div class="d-flex justify-content-center">
+    <form action="/find_doctor" method="post" id="find_doctor_form">
+       <div class="form-group">
+          <input autocomplete="off" autofocus class="form-control" name="find_doctor_id" placeholder="id" type="number" id="find_doctor_id">
+        </div>
+        <div class="form-group">
+          <input autocomplete="off" autofocus class="form-control" name="find_doctor_fullname" placeholder="fullname" type="text" id="find_doctor_fullname">
+        </div>
+        <div class="form-group">
+          <input autocomplete="off" autofocus class="form-control" name="find_doctor_specialty" placeholder="specialty" type="text" id="find_doctor_specialty">
+        </div>
+       <button class="btn btn-primary client_form_button" type="submit" id="find_doctor_button">Submit</button>
+    </form>
+  </div>
+
+{% endblock %}

@@ -1,0 +1,31 @@
+{% extends "layout.html" %}
+
+{% block title %}
+    Log In
+{% endblock %}
+
+{% block main %}
+
+  <h2> Find patient </h2>
+  <div class="d-flex justify-content-center">
+    <form action="/find_patient" method="post" id="find_patient_form">
+       <div class="form-group">
+          <input autocomplete="off" autofocus class="form-control" name="find_patient_id" placeholder="patient id" type="number" id="find_patient_id">
+        </div>
+        <div class="form-group">
+          <input autocomplete="off" autofocus class="form-control" name="find_patient_fullname" placeholder="patient fullname" type="text" id="find_patient_fullname">
+        </div>
+         <div class="form-group">
+          <input autocomplete="off" autofocus class="form-control" name="find_patient_address" placeholder="address" type="text" id="find_patient_address">
+        </div>
+        <div class="form-group">
+          <input autocomplete="off" autofocus class="form-control" name="find_patient_passport_number" placeholder="passport number" type="number" id="find_patient_passport_number">
+        </div>
+        <div class="form-group">
+           <label>Search among my patients</label>
+           <input type="checkbox" name="my_patients" id="my_patients">
+        </div>
+       <button class="btn btn-primary client_form_button" type="submit" id="find_patient_button">Submit</button>
+    </form>
+  </div>
+{% endblock %}

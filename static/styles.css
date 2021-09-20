@@ -1,0 +1,239 @@
+/** general **/
+body {
+    text-align: center;
+    font-size: 1.2em;
+    font-family: "Helvetica", "sans-serif";
+}
+
+h1, h2 {
+    margin-bottom: 1em;
+    font-weight: bold;
+}
+
+h1 {
+    font-size: 2em;
+}
+
+h2 {
+    font-size: 1.6em;
+}
+
+.red {
+    color: #F50E3E;
+}
+
+.highlight {
+    font-weight: bold;
+}
+
+.warning {
+    border: 3px solid red;
+    display: inline-block;
+    padding: 1em;
+}
+
+.shifted-left {
+    text-align: left;
+}
+
+.data_type {
+    color: #314FC1;
+}
+
+/** forms **/
+form {
+    max-width: 20em;
+    padding: 1.5em;
+    background-color: #C6DBEE;
+    border-radius: 5% 5%;
+}
+
+.patient_form {
+    border-radius: 0% 0%;
+}
+
+#social_history_form {
+    background-color: #D485F9;
+}
+
+#diseases_form {
+    background-color: #1FDEA7;
+}
+
+#allergies_form {
+    background-color: #CED74E;
+}
+
+#surgical_history_form {
+    background-color: #C13141;
+}
+
+#family_history_form {
+    background-color: #4EB345;
+}
+
+#habits_form {
+    background-color: #45B3A4;
+}
+
+#immunization_form {
+    background-color: #EB9332;
+}
+
+#tests_results_form {
+    background-color: #D1DD41;
+}
+
+#encounters_form {
+    background-color: #DE1F89;
+}
+
+.skip {
+    margin-top: 1em;
+}
+
+/** tables **/
+#add_disease_medication_div,
+#add_allergy_medication_div,
+#add_immunization_medication_div
+{
+    margin-top: 1em;
+}
+
+/** proposition **/
+.redirection_link_confirmation,
+.redirection_link_rejection {
+    padding: 0.5em;
+    width: 3em;
+    color: #FFF;
+    margin-right: 0.5em;
+}
+
+.redirection_link_confirmation {
+    background-color: green;
+}
+
+.redirection_link_rejection {
+    background-color: red;
+}
+
+.redirection_link_confirmation:hover,
+.redirection_link_rejection:hover {
+    text-decoration: none;
+    color: #58ABF4;
+}
+
+.client_form_button {
+    margin: 0.5em;
+}
+
+/** landing page **/
+#main-image,
+#main-image-mobile-screens {
+    max-width: 30em;
+}
+
+#main-image-mobile-screens {
+    display: none;
+}
+
+#register_message {
+    margin-top: 1em;
+}
+
+#login_form {
+    background-color: #FFF;
+    padding: 0;
+}
+
+#modal_warning,
+#modal_warning_new_patient,
+#modal_warning_diseases,
+#modal_warning_allergies,
+#modal_warning_surgical_history,
+#modal_warning_family_history,
+#modal_warning_habits,
+#modal_warning_immunization_history,
+#modal_warning_tests_results,
+#modal_warning_encounter,
+#modal_warning_update_encounter {
+    display: none;
+}
+
+/*** patients ***/
+.greeting {
+    margin-bottom: 1em;
+    color: red;
+    font-weight: bold;
+}
+
+/*** diseases ***/
+.medication_name_label {
+    margin-bottom: 0.5em;
+}
+
+#disease_medication_button {
+    margin-top: 1em;
+}
+
+/*** patient/<patient_id> ***/
+.patient_table {
+    margin-bottom: 0.5em;
+}
+
+.patient_table tr td {
+    padding: 0.5em 1em 0.5em 1em;
+    text-align: center;
+    max-width: 15em;
+}
+
+#social_history_table tr td {
+    text-align: left;
+}
+
+.patient_table thead tr th {
+    background-color: #0C5493;
+    font-weight: bold;
+    color: #FFF;
+    padding-right: 1em;
+    padding-left: 1em;
+}
+
+#social_history_table tr td:nth-child(odd) {
+    font-weight: bold;
+}
+
+.patient_table tr:nth-child(odd) {
+    background-color: #87C3F8;
+}
+
+.patient_table tr:nth-child(even) {
+    background-color: #B9DCFB;
+}
+
+.table_button {
+    margin-bottom: 0.25em;
+}
+
+/*** queries ***/
+@media screen and (max-width: 500px) {
+   .patient_table thead {
+        display: none;
+    }
+
+    .patient_table tr td {
+        display: block;
+        text-align: center;
+    }
+}
+
+@media screen and (max-width: 768px) {
+    #main-image {
+        display: none;
+    }
+
+    #main-image-mobile-screens {
+        display: block;
+        max-width: 20em;
+    }
+}

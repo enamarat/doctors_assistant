@@ -1,0 +1,139 @@
+{% extends "layout.html" %}
+
+{% block title %}
+    Log In
+{% endblock %}
+
+{% block main %}
+  <div class="d-flex justify-content-flex-start">
+    <div class="shifted-left">
+      <h3> patient: {{patient_fullname}}</h3>
+      <h3> id: {{patient_id}}</h3>
+    </div>
+  </div>
+  <h2> Allergies </h2>
+
+    <div class="d-flex justify-content-center">
+      <form action="/allergies" method="post" id="allergies_form" class="patient_form">
+         <div class="form-group">
+            <input autocomplete="off" autofocus class="form-control" name="allergy_name" placeholder="allergy name" type="text" id="allergy_name">
+          </div>
+          <div class="form-group">
+            <textarea autocomplete="off" autofocus class="form-control" name="allergy_description" placeholder="allergy description" type="text" id="allergy_description"></textarea>
+          </div>
+         <div class="form-group">
+            <input autocomplete="off" autofocus class="form-control" name="allergy_date_of_diagnosis" placeholder="date of diagnosis" type="text" id="allergy_date_of_diagnosis">
+         </div>
+         <div class="form-group">
+           <div class="d-flex justify-content-flex-start">
+             <input autocomplete="off" autofocus class="form-control" name="allergy_end_of_treatment" placeholder="final date of treatment" type="text" id="allergy_end_of_treatment"><label>*</label>
+           </div>
+         </div>
+         <!-- Medication -->
+         <div class="form-group">
+            <div class="form-group">
+               <label class="medication_name_label">Type the name of medication</label>
+                <div class="d-flex justify-content-flex-start">
+                   <input autocomplete="off" autofocus class="form-control" name="allergy_medication_input_name" placeholder="medication name" type="text" id="allergy_medication_input_name"><label>*</label>
+                </div>
+               <select name="allergy_medications_options" id="allergy_medications_options">
+                 <option disabled selected>No matches</option>
+               </select>
+             </div>
+         </div>
+         <div class="form-group">
+           <div class="d-flex justify-content-flex-start">
+             <input autocomplete="off" autofocus class="form-control" name="allergy_medication_dosage" placeholder="medication dosage" type="text" id="allergy_medication_dosage"><label>*</label>
+           </div>
+         </div>
+         <div>
+           <label>* - optional</label>
+         </div>
+         <button class="btn btn-primary client_form_button" type="submit" id="allergy_button">Submit</button>
+      </form>
+    </div>
+
+     <!-- Medication -->
+      <div class="d-flex justify-content-center" id="add_allergy_medication_div">
+         <div>
+           <h3> Haven't found medication? Add one!</h3>
+           <form action="/allergies_medications" method="post" id="allergies_medication_form" class="patient_form">
+             <div class="form-group">
+               <input autocomplete="off" autofocus class="form-control" name="allergy_medication_name" placeholder="medication name" type="text" id="allergy_medication_name">
+               <textarea autocomplete="off" autofocus class="form-control" name="allergy_medication_description" placeholder="medication description" type="text" id="allergy_medication_description"></textarea>
+               <button class="btn btn-secondary" id="allergy_medication_button">Add medication</button>
+             </div>
+           </form>
+         </div>
+      </div>
+
+    <div class="skip">
+      <a href="/surgical_history">Skip</a>
+    </div>
+     <div class="skip">
+      <a href= "{{'/patient/%s'%patient_id}}">To patient's page</a>
+    </div>
+
+    <!-- Modal window warning -->
+         <!-- Button trigger modal -->
+    <button type="button" class="btn btn-primary" data-toggle="modal" data-target="#allergies_warning" id="modal_warning_allergies">
+      Launch
+    </button>
+
+    <!-- Modal -->
+    <div class="modal fade" id="allergies_warning" tabindex="-1" aria-labelledby="allergies_warning" aria-hidden="true">
+      <div class="modal-dialog">
+        <div class="modal-content">
+          <div class="modal-header">
+            <h5 class="modal-title" id="allergies_warning_label">Warning</h5>
+            <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+              <span aria-hidden="true">&times;</span>
+            </button>
+          </div>
+          <div class="modal-body">
+            <ul id="allergies_message"></ul>
+          </div>
+        </div>
+      </div>
+    </div>
+    <!-- End -->
+
+    <!-- Scripts -->
+    <script src="https://code.jquery.com/jquery-3.3.1.min.js"></script>
+    <script>
+      // If medication that a user wants to add already exists
+      document.querySelector("#allergy_medication_button").addEventListener("click", (event)=> {
+        event.preventDefault();
+        $.ajax({
+          type: "POST",
+          url: '/allergies_medications',
+          data: $('#allergies_medication_form').serialize(),
+          success: function(response) {
+            if (response['message'] == "medication already exists") {
+              document.querySelector("#allergies_message").innerHTML = `<li class="red">${response['message']}</li>`;
+              document.querySelector("#modal_warning_allergies").click();
+            }
+          }
+        });
+      });
+
+      document.querySelector("#allergy_medication_input_name").addEventListener("keyup", ()=> {
+          $.ajax({
+            type: "GET",
+            url: '/allergies_medications',
+            data: $('#allergy_medication_input_name').serialize(),
+            success: function(response) {
+              const options = document.querySelector('#allergy_medications_options');
+              options.innerHTML = "";
+              if (response[0]['name'] == "No matches") {
+                options.innerHTML += `<option>${response[0].name}</option>`;
+              } else {
+                for (let i in response) {
+                  options.innerHTML += `<option value=${response[i].id}>${response[i].id}, ${response[i].name}</option>`;
+                }
+              }
+            }
+          });
+      });
+    </script>
+{% endblock %}

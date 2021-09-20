@@ -1,0 +1,57 @@
+{% extends "layout.html" %}
+
+{% block title %}
+    Log In
+{% endblock %}
+
+{% block main %}
+  <div class="d-flex justify-content-flex-start">
+    <div class="shifted-left">
+      <h3> patient: {{patient_fullname}}</h3>
+      <h3 id="patient_id_header"> id: {{patient_id}}</h3>
+    </div>
+  </div>
+  <h2> Tests results </h2>
+
+    <div class="d-flex justify-content-center">
+        <form action="/tests_results" method="post" id="tests_results_form" class="patient_form">
+           <div class="form-group">
+              <input autocomplete="off" autofocus class="form-control" name="test_name" placeholder="test name" type="text" id="test_name">
+            </div>
+           <div class="form-group">
+              <input autocomplete="off" autofocus class="form-control" name="test_date" placeholder="test date" type="text" id="test_date">
+            </div>
+           <div class="form-group">
+             <textarea autocomplete="off" autofocus class="form-control" name="test_result_description" placeholder="test result description" type="text" id="test_result_description"></textarea>
+           </div>
+           <button class="btn btn-primary client_form_button" type="submit" id="tests_results_button">Submit</button>
+        </form>
+    </div>
+     <div class="skip">
+      <a href= "{{'/patient/%s'%patient_id}}">To patient's page</a>
+    </div>
+
+    <!-- Modal window warning -->
+         <!-- Button trigger modal -->
+    <button type="button" class="btn btn-primary" data-toggle="modal" data-target="#tests_results_warning" id="modal_warning_tests_results">
+      Launch
+    </button>
+
+    <!-- Modal -->
+    <div class="modal fade" id="tests_results_warning" tabindex="-1" aria-labelledby="tests_results_warning" aria-hidden="true">
+      <div class="modal-dialog">
+        <div class="modal-content">
+          <div class="modal-header">
+            <h5 class="modal-title" id="tests_results_warning_label">Warning</h5>
+            <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+              <span aria-hidden="true">&times;</span>
+            </button>
+          </div>
+          <div class="modal-body">
+            <ul id="tests_results_message"></ul>
+          </div>
+        </div>
+      </div>
+    </div>
+    <!-- End -->
+{% endblock %}

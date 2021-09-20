@@ -1,0 +1,42 @@
+{% extends "layout.html" %}
+
+{% block title %}
+    Patients Found
+{% endblock %}
+
+{% block main %}
+
+  <h2> Found patients </h2>
+  <div class="d-flex justify-content-center">
+
+    {% if data|length == 0 %}
+      <p> No patients found</p>
+      {% else %}
+        <div class="d-flex justify-content-center">
+        <table class="table table-responsive table-hover patient_table mx-auto w-auto" id="found_patients_table">
+          <thead>
+            <tr>
+              <th>Id</th>
+              <th>Fullname</th>
+              <th>Age</th>
+              <th>Gender</th>
+              <th>Address</th>
+              <th>Passport</th>
+            </tr>
+          </thead>
+        {% for i in range(data|length) %}
+          <tr>
+            <td><a href = "{{'/patient/%s'%data[i]['id']}}" class="red">{{ data[i]['id'] }}</a></td>
+            <td>{{ data[i]['full_name'] }}</td>
+            <td>{{ data[i]['age'] }}</td>
+            <td>{{ data[i]['gender'] }}</td>
+            <td>{{ data[i]['address'] }}</td>
+            <td>{{ data[i]['passport_number'] }}</td>
+          </tr>
+        {% endfor %}
+        </table>
+        </div>
+    {% endif %}
+
+  </div>
+{% endblock %}

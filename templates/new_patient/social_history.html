@@ -1,0 +1,72 @@
+{% extends "layout.html" %}
+
+{% block title %}
+    Log In
+{% endblock %}
+
+{% block main %}
+
+  <h2> Social history </h2>
+
+    <div class="d-flex justify-content-center">
+              <form action="/social_history" method="post" id="social_history_form" class="patient_form">
+                 <div class="form-group">
+                    <input autocomplete="off" autofocus class="form-control" name="patient_fullname" placeholder="fullname" type="text" id="patient_fullname">
+                  </div>
+                  <div class="form-group">
+                    <label for="gender">Gender</label>
+                    <select name="patient_gender" id="patient_gender">
+                        <option value="male">male</option>
+                        <option value="female">female</option>
+                    </select>
+                 </div>
+                 <div class="form-group">
+                    <input autocomplete="off" autofocus class="form-control" name="patient_age" placeholder="age, years" type="number" id="patient_age">
+                 </div>
+                 <div class="form-group">
+                    <input autocomplete="off" autofocus class="form-control" name="patient_address" placeholder="address" type="text" id="patient_address">
+                 </div>
+                 <div class="form-group">
+                    <input autocomplete="off" autofocus class="form-control" name="passport_number" placeholder="passport number" type="number" id="passport_number">
+                 </div>
+                 <div class="form-group">
+                    <input autocomplete="off" autofocus class="form-control" name="patient_religion" placeholder="religion" type="text" id="patient_religion">
+                 </div>
+                 <div class="form-group">
+                    <input autocomplete="off" autofocus class="form-control" name="patient_occupation" placeholder="occupation" type="text" id="patient_occupation">
+                 </div>
+                  <div class="form-group">
+                    <input autocomplete="off" autofocus class="form-control" name="patient_race" placeholder="race" type="text" id="patient_race">
+                 </div>
+                 <div class="form-group">
+                    <input autocomplete="off" autofocus class="form-control" name="patient_nationality" placeholder="nationality" type="text" id="patient_nationality">
+                 </div>
+                 <button class="btn btn-primary" type="submit" id="patient_register_button">Submit</button>
+              </form>
+
+            </div>
+
+    <!-- Modal window warning -->
+         <!-- Button trigger modal -->
+                    <button type="button" class="btn btn-primary" data-toggle="modal" data-target="#social_history_warning" id="modal_warning_new_patient">
+                      Launch
+                    </button>
+
+                    <!-- Modal -->
+                    <div class="modal fade" id="social_history_warning" tabindex="-1" aria-labelledby="social_history_warning" aria-hidden="true">
+                      <div class="modal-dialog">
+                        <div class="modal-content">
+                          <div class="modal-header">
+                            <h5 class="modal-title" id="social_history_warning_label">Warning</h5>
+                            <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                              <span aria-hidden="true">&times;</span>
+                            </button>
+                          </div>
+                          <div class="modal-body">
+                            <ul id="social_history_message"></ul>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+    <!-- End -->
+{% endblock %}

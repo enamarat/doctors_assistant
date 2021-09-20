@@ -1,0 +1,127 @@
+{% extends "layout.html" %}
+
+{% block title %}
+    Log In
+{% endblock %}
+
+{% block main %}
+  <div class="d-flex justify-content-flex-start">
+    <div class="shifted-left">
+      <h3> patient: {{patient_fullname}}</h3>
+      <h3> id: {{patient_id}}</h3>
+    </div>
+  </div>
+  <h2> Immunization history </h2>
+
+    <div class="d-flex justify-content-center">
+        <form action="/immunization_history" method="post" id="immunization_history_form" class="patient_form">
+           <div class="form-group">
+              <input autocomplete="off" autofocus class="form-control" name="immunization_name" placeholder="immunization name" type="text" id="immunization_name">
+            </div>
+           <div class="form-group">
+              <input autocomplete="off" autofocus class="form-control" name="immunization_date" placeholder="immunization date" type="text" id="immunization_date">
+            </div>
+               <!-- Medication -->
+           <div class="form-group">
+              <div class="form-group">
+                 <label class="medication_name_label">Type the name of medication</label>
+                  <div class="d-flex justify-content-flex-start">
+                     <input autocomplete="off" autofocus class="form-control" name="immunization_medication_input_name" placeholder="medication name" type="text" id="immunization_medication_input_name"><label>*</label>
+                  </div>
+                 <select name="immunization_medications_options" id="immunization_medications_options">
+                   <option disabled selected>No matches</option>
+                 </select>
+               </div>
+           </div>
+           <div>
+             <label>* - optional</label>
+           </div>
+           <button class="btn btn-primary client_form_button" type="submit" id="immunization_history_button">Submit</button>
+        </form>
+    </div>
+
+    <!-- Medication -->
+      <div class="d-flex justify-content-center" id="add_immunization_medication_div">
+         <div>
+           <h3> Haven't found medication? Add one!</h3>
+           <form action="/immunization_medications" method="post" id="immunization_medication_form" class="patient_form">
+             <div class="form-group">
+               <input autocomplete="off" autofocus class="form-control" name="immunization_medication_name" placeholder="medication name" type="text" id="immunization_medication_name">
+               <textarea autocomplete="off" autofocus class="form-control" name="immunization_medication_description" placeholder="medication description" type="text" id="immunization_medication_description"></textarea>
+               <button class="btn btn-secondary" id="immunization_medication_button">Add medication</button>
+             </div>
+           </form>
+         </div>
+      </div>
+
+    <div class="skip">
+      <a href="/tests_results">Skip</a>
+    </div>
+     <div class="skip">
+      <a href= "{{'/patient/%s'%patient_id}}">To patient's page</a>
+    </div>
+
+    <!-- Modal window warning -->
+         <!-- Button trigger modal -->
+    <button type="button" class="btn btn-primary" data-toggle="modal" data-target="#immunization_history_warning" id="modal_warning_immunization_history">
+      Launch
+    </button>
+
+    <!-- Modal -->
+    <div class="modal fade" id="immunization_history_warning" tabindex="-1" aria-labelledby="immunization_history_warning" aria-hidden="true">
+      <div class="modal-dialog">
+        <div class="modal-content">
+          <div class="modal-header">
+            <h5 class="modal-title" id="immunization_history_warning_label">Warning</h5>
+            <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+              <span aria-hidden="true">&times;</span>
+            </button>
+          </div>
+          <div class="modal-body">
+            <ul id="immunization_history_message"></ul>
+          </div>
+        </div>
+      </div>
+    </div>
+    <!-- End -->
+
+
+     <!-- Scripts -->
+    <script src="https://code.jquery.com/jquery-3.3.1.min.js"></script>
+    <script>
+      // If medication that a user wants to add already exists
+      document.querySelector("#immunization_medication_button").addEventListener("click", (event)=> {
+        event.preventDefault();
+        $.ajax({
+          type: "POST",
+          url: '/immunization_medications',
+          data: $('#immunization_medication_form').serialize(),
+          success: function(response) {
+            if (response['message'] == "medication already exists") {
+              document.querySelector("#immunization_history_message").innerHTML = `<li class="red">${response['message']}</li>`;
+              document.querySelector("#modal_warning_immunization_history").click();
+            }
+          }
+        });
+      });
+
+      document.querySelector("#immunization_medication_input_name").addEventListener("keyup", ()=> {
+          $.ajax({
+            type: "GET",
+            url: '/immunization_medications',
+            data: $('#immunization_medication_input_name').serialize(),
+            success: function(response) {
+              const options = document.querySelector('#immunization_medications_options');
+              options.innerHTML = "";
+              if (response[0]['name'] == "No matches") {
+                options.innerHTML += `<option>${response[0].name}</option>`;
+              } else {
+                for (let i in response) {
+                  options.innerHTML += `<option value=${response[i].id}>${response[i].id}, ${response[i].name}</option>`;
+                }
+              }
+            }
+          });
+      });
+    </script>
+{% endblock %}

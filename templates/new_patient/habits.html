@@ -1,0 +1,57 @@
+{% extends "layout.html" %}
+
+{% block title %}
+    Log In
+{% endblock %}
+
+{% block main %}
+  <div class="d-flex justify-content-flex-start">
+    <div class="shifted-left">
+      <h3> patient: {{patient_fullname}}</h3>
+      <h3> id: {{patient_id}}</h3>
+    </div>
+  </div>
+  <h2> Habits </h2>
+
+    <div class="d-flex justify-content-center">
+        <form action="/habits" method="post" id="habits_form" class="patient_form">
+           <div class="form-group">
+              <input autocomplete="off" autofocus class="form-control" name="habit_name" placeholder="habit name" type="text" id="habit_name">
+            </div>
+            <div class="form-group">
+              <input autocomplete="off" autofocus class="form-control" name="habit_year" placeholder="year when started" type="number" id="habit_year">
+            </div>
+           <button class="btn btn-primary client_form_button" type="submit" id="habits_button">Submit</button>
+        </form>
+    </div>
+    <div class="skip">
+      <a href="/diseases">Skip</a>
+    </div>
+     <div class="skip">
+      <a href= "{{'/patient/%s'%patient_id}}">To patient's page</a>
+    </div>
+
+    <!-- Modal window warning -->
+         <!-- Button trigger modal -->
+    <button type="button" class="btn btn-primary" data-toggle="modal" data-target="#habits_warning" id="modal_warning_habits">
+      Launch
+    </button>
+
+    <!-- Modal -->
+    <div class="modal fade" id="habits_warning" tabindex="-1" aria-labelledby="habits_warning" aria-hidden="true">
+      <div class="modal-dialog">
+        <div class="modal-content">
+          <div class="modal-header">
+            <h5 class="modal-title" id="habits_warning_label">Warning</h5>
+            <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+              <span aria-hidden="true">&times;</span>
+            </button>
+          </div>
+          <div class="modal-body">
+            <ul id="habits_message"></ul>
+          </div>
+        </div>
+      </div>
+    </div>
+    <!-- End -->
+{% endblock %}
