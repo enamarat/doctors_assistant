@@ -1,6 +1,6 @@
 import os
-
-from cs50 import SQL
+import sqlite3
+from flask import g
 from flask import Flask, flash, redirect, render_template, request, session, jsonify
 from flask_session import Session
 from tempfile import mkdtemp
@@ -13,6 +13,13 @@ from helpers import apology, login_required
 
 # Configure application
 app = Flask(__name__)
+
+# Function for a database
+def dict_factory(cursor, row):
+    d = {}
+    for idx, col in enumerate(cursor.description):
+        d[col[0]] = row[idx]
+    return d
 
 # Ensure templates are auto-reloaded
 app.config["TEMPLATES_AUTO_RELOAD"] = True
@@ -30,9 +37,6 @@ app.config["SESSION_FILE_DIR"] = mkdtemp()
 app.config["SESSION_PERMANENT"] = False
 app.config["SESSION_TYPE"] = "filesystem"
 Session(app)
-
-# Configure database
-db = SQL("sqlite:///medical_history.db")
 
 # Configure routes
 @app.route("/")
@@ -85,16 +89,29 @@ def register():
         if float(request.form.get("experience")) < 0:
             return apology("negative numbers are not accepted", 400)
 
-        rows = db.execute("SELECT username FROM doctors WHERE username = ?", request.form.get("username").lower())
+        con = sqlite3.connect('./medical_history.db')
+        con.row_factory = sqlite3.Row
+        cur = con.cursor()
+        cur.execute("SELECT username FROM doctors WHERE username = ?", (request.form.get("username").lower(),))
+        rows = cur.fetchall()
         if len(rows) == 1:
             return apology("username already exists", 400)
 
         # Insert user into the database
         hashed_password = generate_password_hash(request.form.get("password"))
-        db.execute("INSERT INTO doctors(username, password, full_name, gender, age, experience, specialty) VALUES(?,?,?,?,?,?,?)", request.form.get("username").lower(), hashed_password, request.form.get("fullname"), request.form.get("gender"), request.form.get("age"), request.form.get("experience"), request.form.get("specialty"))
+        con = sqlite3.connect('./medical_history.db')
+        con.row_factory = sqlite3.Row
+        cur = con.cursor()
+        cur.execute("INSERT INTO doctors(username, password, full_name, gender, age, experience, specialty) VALUES(?,?,?,?,?,?,?)", (request.form.get("username").lower(), hashed_password, request.form.get("fullname"), request.form.get("gender"), request.form.get("age"), request.form.get("experience"), request.form.get("specialty"),))
+        con.commit()
+        con.close()
 
         # Log in user
-        rows = db.execute("SELECT * FROM doctors WHERE username = ?", request.form.get("username").lower())
+        con = sqlite3.connect('./medical_history.db')
+        con.row_factory = sqlite3.Row
+        cur = con.cursor()
+        cur.execute("SELECT * FROM doctors WHERE username = ?", (request.form.get("username").lower(),))
+        rows = cur.fetchall()
         session["user_id"] = rows[0]["id"]
 
         return redirect("/patients")
@@ -108,9 +125,12 @@ def login():
     session.clear()
 
     if request.method == "POST":
-
         # Query database for username
-        rows = db.execute("SELECT * FROM doctors WHERE username = ?", request.form.get("username").lower())
+        con = sqlite3.connect('./medical_history.db')
+        con.row_factory = sqlite3.Row
+        cur = con.cursor()
+        cur.execute("SELECT * FROM doctors WHERE username = ?", (request.form.get("username").lower(),))
+        rows = cur.fetchall()
 
         # Ensure username exists and password is correct
         if len(rows) != 1 or not check_password_hash(rows[0]["password"], request.form.get("password")):
@@ -118,7 +138,6 @@ def login():
 
         # Remember which user has logged in
         session["user_id"] = rows[0]["id"]
-
         return redirect("/patients")
     else:
         return redirect("/")
@@ -128,7 +147,6 @@ def login():
 def logout():
     # Forget any user_id
     session.clear()
-
     # Redirect user to login form
     return redirect("/")
 
@@ -136,26 +154,47 @@ def logout():
 @app.route("/patients")
 @login_required
 def patients():
-    data = db.execute("SELECT * FROM medical_encounters WHERE doctor_id = ? ORDER BY date DESC", session["user_id"])
-    fullname = db.execute("SELECT full_name FROM doctors WHERE id = ?", session["user_id"])
+    con = sqlite3.connect('./medical_history.db')
+    con.row_factory = sqlite3.Row
+    cur = con.cursor()
+    cur.execute("SELECT * FROM medical_encounters WHERE doctor_id = ? ORDER BY date DESC", (session["user_id"],))
+    data = cur.fetchall()
+    cur.execute("SELECT full_name FROM doctors WHERE id = ?", (session["user_id"],))
+    fullname = cur.fetchall()
     return render_template("patients.html", data = data, fullname = fullname)
 
 @app.route("/patient/<patient_id>", methods=["GET", "DELETE", "PUT"])
 @login_required
 def patient(patient_id):
     if request.method == "GET":
-        social_history = db.execute("SELECT * FROM social_history WHERE id = ?", patient_id)
-        family_history = db.execute("SELECT * FROM family_history WHERE patient_id = ?", patient_id)
-        habits = db.execute("SELECT * FROM habits WHERE patient_id = ?", patient_id)
-        diseases = db.execute("SELECT * FROM diseases WHERE patient_id = ?", patient_id)
-        allergies = db.execute("SELECT * FROM allergies WHERE patient_id = ?", patient_id)
-        surgical_history = db.execute("SELECT * FROM surgical_history WHERE patient_id = ?", patient_id)
-        immunization_history = db.execute("SELECT * FROM immunization_history WHERE patient_id = ?", patient_id)
-        tests_results = db.execute("SELECT * FROM tests_results WHERE patient_id = ?", patient_id)
-        medications_diseases = db.execute("SELECT diseases.id, diseases.name AS disease_name, diseases.medication_id, medications.name AS medication_name, medications.description AS medication_description, diseases.dosage FROM diseases JOIN medications ON diseases.medication_id = medications.id WHERE diseases.patient_id = ?", patient_id)
-        medications_allergies = db.execute("SELECT allergies.id, allergies.name AS allergy_name, allergies.medication_id, medications.name AS medication_name, medications.description AS medication_description, allergies.dosage FROM allergies JOIN medications ON allergies.medication_id = medications.id WHERE allergies.patient_id = ?", patient_id)
-        medications_immunization = db.execute("SELECT immunization_history.id, immunization_history.name AS immunization_name, immunization_history.medication_id, medications.name AS medication_name, medications.description AS medication_description FROM immunization_history JOIN medications ON immunization_history.medication_id = medications.id WHERE immunization_history.patient_id = ?", patient_id)
-        encounters = db.execute("SELECT * FROM medical_encounters WHERE patient_id = ?", patient_id)
+        con = sqlite3.connect('./medical_history.db')
+        con.row_factory = sqlite3.Row
+        cur = con.cursor()
+
+        cur.execute("SELECT * FROM social_history WHERE id = ?", (patient_id,))
+        social_history = cur.fetchall()
+        cur.execute("SELECT * FROM family_history WHERE patient_id = ?", (patient_id,))
+        family_history = cur.fetchall()
+        cur.execute("SELECT * FROM habits WHERE patient_id = ?", (patient_id,))
+        habits = cur.fetchall()
+        cur.execute("SELECT * FROM diseases WHERE patient_id = ?", (patient_id,))
+        diseases = cur.fetchall()
+        cur.execute("SELECT * FROM allergies WHERE patient_id = ?", (patient_id,))
+        allergies = cur.fetchall()
+        cur.execute("SELECT * FROM surgical_history WHERE patient_id = ?", (patient_id,))
+        surgical_history = cur.fetchall()
+        cur.execute("SELECT * FROM immunization_history WHERE patient_id = ?", (patient_id,))
+        immunization_history = cur.fetchall()
+        cur.execute("SELECT * FROM tests_results WHERE patient_id = ?", (patient_id,))
+        tests_results = cur.fetchall()
+        cur.execute("SELECT diseases.id, diseases.name AS disease_name, diseases.medication_id, medications.name AS medication_name, medications.description AS medication_description, diseases.dosage FROM diseases JOIN medications ON diseases.medication_id = medications.id WHERE diseases.patient_id = ?", (patient_id,))
+        medications_diseases = cur.fetchall()
+        cur.execute("SELECT allergies.id, allergies.name AS allergy_name, allergies.medication_id, medications.name AS medication_name, medications.description AS medication_description, allergies.dosage FROM allergies JOIN medications ON allergies.medication_id = medications.id WHERE allergies.patient_id = ?", (patient_id,))
+        medications_allergies = cur.fetchall()
+        cur.execute("SELECT immunization_history.id, immunization_history.name AS immunization_name, immunization_history.medication_id, medications.name AS medication_name, medications.description AS medication_description FROM immunization_history JOIN medications ON immunization_history.medication_id = medications.id WHERE immunization_history.patient_id = ?", (patient_id,))
+        medications_immunization = cur.fetchall()
+        cur.execute("SELECT * FROM medical_encounters WHERE patient_id = ?", (patient_id,))
+        encounters = cur.fetchall()
 
         data = {
             'social_history': social_history,
@@ -177,7 +216,12 @@ def patient(patient_id):
     elif request.method == "DELETE":
         response = None
         if int(request.get_json()['doctor_id']) == session['user_id']:
-            db.execute("DELETE FROM medical_encounters WHERE doctor_id = ? AND id = ?", session["user_id"], int(request.get_json()['encounter_id']))
+            con = sqlite3.connect('./medical_history.db')
+            con.row_factory = sqlite3.Row
+            cur = con.cursor()
+            cur.execute("DELETE FROM medical_encounters WHERE doctor_id = ? AND id = ?", (session["user_id"], int(request.get_json()['encounter_id']),))
+            con.commit()
+            con.close()
             response = {"encounter_id": request.get_json()['encounter_id']}
         else:
             response = "You can't delete encounters that are not created by you!"
@@ -195,8 +239,16 @@ def patient(patient_id):
             return apology("edited value of assessment and plan is empty", 400)
 
         if int(request.get_json()['doctor_id']) == session['user_id']:
-            db.execute("UPDATE medical_encounters SET chief_complaint = ?, history_of_illness = ?, examination = ?, assessment_and_plan = ? WHERE doctor_id = ? AND id = ?", request.get_json()['chief_complaint_new_input'], request.get_json()['history_of_illness_new_input'], request.get_json()['examination_new_input'], request.get_json()['assessment_and_plan_new_input'], session["user_id"], int(request.get_json()['encounter_id']))
-            edited_encounter = db.execute("SELECT * FROM medical_encounters WHERE id = ?", int(request.get_json()['encounter_id']))
+            con = sqlite3.connect('./medical_history.db')
+            con.row_factory = dict_factory
+            cur = con.cursor()
+            cur.execute("UPDATE medical_encounters SET chief_complaint = ?, history_of_illness = ?, examination = ?, assessment_and_plan = ? WHERE doctor_id = ? AND id = ?", (request.get_json()['chief_complaint_new_input'], request.get_json()['history_of_illness_new_input'], request.get_json()['examination_new_input'], request.get_json()['assessment_and_plan_new_input'], session["user_id"], int(request.get_json()['encounter_id']),))
+            con.commit()
+            cur.execute("SELECT * FROM medical_encounters WHERE id = ?", (int(request.get_json()['encounter_id']),))
+            edited_encounter = cur.fetchall()
+            #for row in rows:
+            #data.append(list(row))
+
             response = {
                 "encounter_id": request.get_json()['encounter_id'],
                 "edited_encounter": edited_encounter
@@ -257,11 +309,20 @@ def social_history():
             return apology("negative numbers are not accepted", 400)
 
         # database
-        db.execute("INSERT INTO social_history(full_name, gender, age, passport_number, address, religion, occupation, race, nationality, doctor_id) VALUES(?,?,?,?,?,?,?,?,?,?)", request.form.get("patient_fullname"),  request.form.get("patient_gender"), request.form.get("patient_age"), request.form.get("passport_number"), request.form.get("patient_address"), request.form.get("patient_religion"), request.form.get("patient_occupation"), request.form.get("patient_race"), request.form.get("patient_nationality"), session["user_id"])
+        con = sqlite3.connect('./medical_history.db')
+        con.row_factory = sqlite3.Row
+        cur = con.cursor()
+        cur.execute("INSERT INTO social_history(full_name, gender, age, passport_number, address, religion, occupation, race, nationality, doctor_id) VALUES(?,?,?,?,?,?,?,?,?,?)", (request.form.get("patient_fullname"),  request.form.get("patient_gender"), request.form.get("patient_age"), request.form.get("passport_number"), request.form.get("patient_address"), request.form.get("patient_religion"), request.form.get("patient_occupation"), request.form.get("patient_race"), request.form.get("patient_nationality"), session["user_id"],))
+        con.commit()
+        con.close()
 
         # session
         session['patient_fullname'] = request.form.get("patient_fullname")
-        last_id = db.execute("SELECT MAX(id) FROM social_history WHERE doctor_id = ?", session["user_id"])[0]['MAX(id)']
+        con = sqlite3.connect('./medical_history.db')
+        con.row_factory = sqlite3.Row
+        cur = con.cursor()
+        cur.execute("SELECT MAX(id) FROM social_history WHERE doctor_id = ?", (session["user_id"],))
+        last_id  = cur.fetchall()[0]['MAX(id)']
         session['patient_id'] = last_id
 
         return redirect("/family_history")
@@ -297,7 +358,12 @@ def family_history():
         if request.form.get("relative_age") and regex_integers_relative_age == None:
             return apology("relative age must be a positive integer", 400)
 
-        db.execute("INSERT INTO family_history(full_name, relative_status, gender, age, allergies, diseases, cause_of_death, patient_id) VALUES(?,?,?,?,?,?,?,?)", request.form.get("relative_name"),  request.form.get("relative_status"), request.form.get("relative_gender"), request.form.get("relative_age"), request.form.get("relative_allergies"), request.form.get("relative_diseases"), request.form.get("relative_cause_of_death"), session['patient_id'])
+        con = sqlite3.connect('./medical_history.db')
+        con.row_factory = sqlite3.Row
+        cur = con.cursor()
+        cur.execute("INSERT INTO family_history(full_name, relative_status, gender, age, allergies, diseases, cause_of_death, patient_id) VALUES(?,?,?,?,?,?,?,?)", (request.form.get("relative_name"),  request.form.get("relative_status"), request.form.get("relative_gender"), request.form.get("relative_age"), request.form.get("relative_allergies"), request.form.get("relative_diseases"), request.form.get("relative_cause_of_death"), session['patient_id'],))
+        con.commit()
+        con.close()
 
         session['section'] = "relative"
         session['link_back'] = "/family_history"
@@ -322,7 +388,12 @@ def habits():
         if request.form.get("habit_year") and regex_integers_habit_year == None:
             return apology("year must be a positive integer", 400)
 
-        db.execute("INSERT INTO habits(name, year, patient_id) VALUES(?,?,?)", request.form.get("habit_name"),  request.form.get("habit_year"), session['patient_id'])
+        con = sqlite3.connect('./medical_history.db')
+        con.row_factory = sqlite3.Row
+        cur = con.cursor()
+        cur.execute("INSERT INTO habits(name, year, patient_id) VALUES(?,?,?)", (request.form.get("habit_name"),  request.form.get("habit_year"), session['patient_id'],))
+        con.commit()
+        con.close()
 
         session['section'] = "habit"
         session['link_back'] = "/habits"
@@ -361,7 +432,12 @@ def diseases():
         if request.form.get("disease_medications_options") != None and regex_integers_medication_id == None:
             return apology("medication id must be a positive integer", 400)
 
-        db.execute("INSERT INTO diseases(name, description, date, end_of_treatment, medication_id, dosage, patient_id, doctor_id) VALUES(?,?,?,?,?,?,?,?)", request.form.get("disease_name"),  request.form.get("disease_description"), request.form.get("disease_date_of_diagnosis"), request.form.get("disease_end_of_treatment"), request.form.get("disease_medications_options"), request.form.get("disease_medication_dosage"), session['patient_id'], session["user_id"])
+        con = sqlite3.connect('./medical_history.db')
+        con.row_factory = sqlite3.Row
+        cur = con.cursor()
+        cur.execute("INSERT INTO diseases(name, description, date, end_of_treatment, medication_id, dosage, patient_id, doctor_id) VALUES(?,?,?,?,?,?,?,?)", (request.form.get("disease_name"),  request.form.get("disease_description"), request.form.get("disease_date_of_diagnosis"), request.form.get("disease_end_of_treatment"), request.form.get("disease_medications_options"), request.form.get("disease_medication_dosage"), session['patient_id'], session["user_id"],))
+        con.commit()
+        con.close()
 
         session['section'] = "disease"
         session['link_back'] = "/diseases"
@@ -380,16 +456,36 @@ def diseases_medications():
         if not request.form.get("disease_medication_description"):
             return apology("must provide description of the medication", 400)
 
-        medication = db.execute("SELECT name FROM medications WHERE name = ?", request.form["disease_medication_name"].lower());
+        con = sqlite3.connect('./medical_history.db')
+        con.row_factory = dict_factory
+        cur = con.cursor()
+        cur.execute("SELECT name FROM medications WHERE name = ?", (request.form["disease_medication_name"].lower(),))
+        medication = cur.fetchall()
+
         if len(medication) > 0:
             return jsonify({"message": "medication already exists"})
-        db.execute("INSERT INTO medications(name, description) VALUES(?,?)", request.form["disease_medication_name"],  request.form["disease_medication_description"])
-        medications = db.execute("SELECT * FROM medications")
+        # insert medication into database
+        con = sqlite3.connect('./medical_history.db')
+        con.row_factory = dict_factory
+        cur = con.cursor()
+        cur.execute("INSERT INTO medications(name, description) VALUES(?,?)", (request.form["disease_medication_name"],  request.form["disease_medication_description"],))
+        con.commit()
+        con.close()
+        # refresh the list of available medications
+        con = sqlite3.connect('./medical_history.db')
+        con.row_factory = dict_factory
+        cur = con.cursor()
+        cur.execute("SELECT * FROM medications")
+        medications = cur.fetchall()
         return jsonify(medications)
     else:
         medications = [{"name": "No matches"}]
         if len(request.args.get("disease_medication_input_name")) > 0:
-            medications = db.execute("SELECT * FROM medications WHERE name LIKE ?", "%" + request.args.get("disease_medication_input_name") + "%")
+            con = sqlite3.connect('./medical_history.db')
+            con.row_factory = dict_factory
+            cur = con.cursor()
+            cur.execute("SELECT * FROM medications WHERE name LIKE ?", ("%" + request.args.get("disease_medication_input_name") + "%",))
+            medications = cur.fetchall()
             if len(medications) == 0:
                 medications = [{"name": "No matches"}]
         return jsonify(medications)
@@ -424,7 +520,12 @@ def allergies():
         if request.form.get("allergy_medications_options") != None and regex_integers_medication_id == None:
             return apology("medication id must be a positive integer", 400)
 
-        db.execute("INSERT INTO allergies(name, description, date, end_of_treatment, medication_id, dosage, patient_id, doctor_id) VALUES(?,?,?,?,?,?,?,?)", request.form.get("allergy_name"),  request.form.get("allergy_description"), request.form.get("allergy_date_of_diagnosis"), request.form.get("allergy_end_of_treatment"), request.form.get("allergy_medications_options"), request.form.get("allergy_medication_dosage"), session['patient_id'], session["user_id"])
+        con = sqlite3.connect('./medical_history.db')
+        con.row_factory = sqlite3.Row
+        cur = con.cursor()
+        cur.execute("INSERT INTO allergies(name, description, date, end_of_treatment, medication_id, dosage, patient_id, doctor_id) VALUES(?,?,?,?,?,?,?,?)", (request.form.get("allergy_name"),  request.form.get("allergy_description"), request.form.get("allergy_date_of_diagnosis"), request.form.get("allergy_end_of_treatment"), request.form.get("allergy_medications_options"), request.form.get("allergy_medication_dosage"), session['patient_id'], session["user_id"],))
+        con.commit()
+        con.close()
 
         session['section'] = "allergy"
         session['link_back'] = "/allergies"
@@ -443,16 +544,36 @@ def allergies_medications():
         if not request.form.get("allergy_medication_description"):
             return apology("must provide description of the medication", 400)
 
-        medication = db.execute("SELECT name FROM medications WHERE name = ?", request.form["allergy_medication_name"].lower());
+        con = sqlite3.connect('./medical_history.db')
+        con.row_factory = dict_factory
+        cur = con.cursor()
+        cur.execute("SELECT name FROM medications WHERE name = ?", (request.form["allergy_medication_name"].lower(),))
+        medication = cur.fetchall()
+
         if len(medication) > 0:
             return jsonify({"message": "medication already exists"})
-        db.execute("INSERT INTO medications(name, description) VALUES(?,?)", request.form["allergy_medication_name"],  request.form["allergy_medication_description"])
-        medications = db.execute("SELECT * FROM medications")
+        # insert medication into database
+        con = sqlite3.connect('./medical_history.db')
+        con.row_factory = dict_factory
+        cur = con.cursor()
+        cur.execute("INSERT INTO medications(name, description) VALUES(?,?)", (request.form["allergy_medication_name"],  request.form["allergy_medication_description"],))
+        con.commit()
+        con.close()
+        # refresh the list of available medications
+        con = sqlite3.connect('./medical_history.db')
+        con.row_factory = dict_factory
+        cur = con.cursor()
+        cur.execute("SELECT * FROM medications")
+        medications = cur.fetchall()
         return jsonify(medications)
     else:
         medications = [{"name": "No matches"}]
         if len(request.args.get("allergy_medication_input_name")) > 0:
-            medications = db.execute("SELECT * FROM medications WHERE name LIKE ?", "%" + request.args.get("allergy_medication_input_name") + "%")
+            con = sqlite3.connect('./medical_history.db')
+            con.row_factory = dict_factory
+            cur = con.cursor()
+            cur.execute("SELECT * FROM medications WHERE name LIKE ?", ("%" + request.args.get("allergy_medication_input_name") + "%",))
+            medications = cur.fetchall()
             if len(medications) == 0:
                 medications = [{"name": "No matches"}]
         return jsonify(medications)
@@ -481,7 +602,12 @@ def surgical_history():
         if regex_date_format_surgery_date == None:
             return apology("the date must be in format yyyy-mm-dd", 400)
 
-        db.execute("INSERT INTO surgical_history(operation_name, description, date, preoperative_diagnosis, postoperative_diagnosis, condition_after_surgery, patient_id, doctor_id) VALUES(?,?,?,?,?,?,?,?)", request.form.get("surgery_name"),  request.form.get("surgery_description"), request.form.get("surgery_date"), request.form.get("surgery_preoperative_diagnosis"), request.form.get("surgery_postoperative_diagnosis"), request.form.get("condition_after_surgery"), session['patient_id'], session["user_id"])
+        con = sqlite3.connect('./medical_history.db')
+        con.row_factory = sqlite3.Row
+        cur = con.cursor()
+        cur.execute("INSERT INTO surgical_history(operation_name, description, date, preoperative_diagnosis, postoperative_diagnosis, condition_after_surgery, patient_id, doctor_id) VALUES(?,?,?,?,?,?,?,?)", (request.form.get("surgery_name"),  request.form.get("surgery_description"), request.form.get("surgery_date"), request.form.get("surgery_preoperative_diagnosis"), request.form.get("surgery_postoperative_diagnosis"), request.form.get("condition_after_surgery"), session['patient_id'], session["user_id"],))
+        con.commit()
+        con.close()
 
         session['section'] = "surgery"
         session['link_back'] = "/surgical_history"
@@ -514,7 +640,12 @@ def immunization_history():
         if request.form.get("immunization_medications_options") != None and regex_integers_medication_id == None:
             return apology("medication id must be a positive integer", 400)
 
-        db.execute("INSERT INTO immunization_history(name, date, medication_id, patient_id) VALUES(?,?,?,?)", request.form.get("immunization_name"),  request.form.get("immunization_date"), request.form.get("immunization_medications_options"), session['patient_id'])
+        con = sqlite3.connect('./medical_history.db')
+        con.row_factory = sqlite3.Row
+        cur = con.cursor()
+        cur.execute("INSERT INTO immunization_history(name, date, medication_id, patient_id) VALUES(?,?,?,?)", (request.form.get("immunization_name"),  request.form.get("immunization_date"), request.form.get("immunization_medications_options"), session['patient_id'],))
+        con.commit()
+        con.close()
 
         session['section'] = "immunization"
         session['link_back'] = "/immunization_history"
@@ -533,16 +664,36 @@ def immunization_medications():
         if not request.form.get("immunization_medication_description"):
             return apology("must provide description of the medication", 400)
 
-        medication = db.execute("SELECT name FROM medications WHERE name = ?", request.form["immunization_medication_name"].lower());
+        con = sqlite3.connect('./medical_history.db')
+        con.row_factory = dict_factory
+        cur = con.cursor()
+        cur.execute("SELECT name FROM medications WHERE name = ?", (request.form["immunization_medication_name"].lower(),))
+        medication = cur.fetchall()
+
         if len(medication) > 0:
             return jsonify({"message": "medication already exists"})
-        db.execute("INSERT INTO medications(name, description) VALUES(?,?)", request.form["immunization_medication_name"],  request.form["immunization_medication_description"])
-        medications = db.execute("SELECT * FROM medications")
+        # insert medication into database
+        con = sqlite3.connect('./medical_history.db')
+        con.row_factory = dict_factory
+        cur = con.cursor()
+        cur.execute("INSERT INTO medications(name, description) VALUES(?,?)", (request.form["immunization_medication_name"],  request.form["immunization_medication_description"],))
+        con.commit()
+        con.close()
+        # refresh the list of available medications
+        con = sqlite3.connect('./medical_history.db')
+        con.row_factory = dict_factory
+        cur = con.cursor()
+        cur.execute("SELECT * FROM medications")
+        medications = cur.fetchall()
         return jsonify(medications)
     else:
         medications = [{"name": "No matches"}]
         if len(request.args.get("immunization_medication_input_name")) > 0:
-            medications = db.execute("SELECT * FROM medications WHERE name LIKE ?", "%" + request.args.get("immunization_medication_input_name") + "%")
+            con = sqlite3.connect('./medical_history.db')
+            con.row_factory = dict_factory
+            cur = con.cursor()
+            cur.execute("SELECT * FROM medications WHERE name LIKE ?", ("%" + request.args.get("immunization_medication_input_name") + "%",))
+            medications = cur.fetchall()
             if len(medications) == 0:
                 medications = [{"name": "No matches"}]
         return jsonify(medications)
@@ -565,7 +716,12 @@ def tests_results():
         if regex_date_format_test_date == None:
             return apology("the date must be in format yyyy-mm-dd", 400)
 
-        db.execute("INSERT INTO tests_results(name, date, result_description, patient_id) VALUES(?,?,?,?)", request.form.get("test_name"),  request.form.get("test_date"), request.form.get("test_result_description"), session['patient_id'])
+        con = sqlite3.connect('./medical_history.db')
+        con.row_factory = sqlite3.Row
+        cur = con.cursor()
+        cur.execute("INSERT INTO tests_results(name, date, result_description, patient_id) VALUES(?,?,?,?)", (request.form.get("test_name"),  request.form.get("test_date"), request.form.get("test_result_description"), session['patient_id'],))
+        con.commit()
+        con.close()
 
         session['section'] = "test"
         session['link_back'] = "/tests_results"
@@ -588,7 +744,12 @@ def encounters():
         if not request.form.get("assessment_and_plan"):
             return apology("must provide assessment and plan", 400)
 
-        db.execute("INSERT INTO medical_encounters(chief_complaint, history_of_illness, examination, assessment_and_plan, patient_id, doctor_id) VALUES(?,?,?,?,?,?)", request.form.get("chief_complaint"),  request.form.get("history_of_illness"), request.form.get("examination"), request.form.get("assessment_and_plan"), session['patient_id'], session["user_id"])
+        con = sqlite3.connect('./medical_history.db')
+        con.row_factory = sqlite3.Row
+        cur = con.cursor()
+        cur.execute("INSERT INTO medical_encounters(chief_complaint, history_of_illness, examination, assessment_and_plan, patient_id, doctor_id) VALUES(?,?,?,?,?,?)", (request.form.get("chief_complaint"),  request.form.get("history_of_illness"), request.form.get("examination"), request.form.get("assessment_and_plan"), session['patient_id'], session["user_id"],))
+        con.commit()
+        con.close()
 
         return redirect(f"/patient/{session['patient_id']}")
     else:
@@ -650,7 +811,11 @@ def find_patient():
             first_parameter = False
             search_parameters.append(session['user_id'])
 
-        data = db.execute(search_string, *search_parameters)
+        con = sqlite3.connect('./medical_history.db')
+        con.row_factory = sqlite3.Row
+        cur = con.cursor()
+        cur.execute(search_string, (*search_parameters,))
+        data = cur.fetchall()
         return render_template("/found_patients.html", data = data)
     else:
         return render_template("/find_patient.html")
@@ -691,12 +856,21 @@ def find_doctor():
             first_parameter = False
             search_parameters.append("%" + request.form.get("find_doctor_specialty").lower() + "%")
 
-        data = db.execute(search_string, *search_parameters)
+        con = sqlite3.connect('./medical_history.db')
+        con.row_factory = sqlite3.Row
+        cur = con.cursor()
+        cur.execute(search_string, (*search_parameters,))
+        data = cur.fetchall()
+
         encounters = []
         if len(data) > 0:
             for i in range(len(data)):
-                encounters.append(db.execute("SELECT * FROM medical_encounters WHERE doctor_id = ?", data[i]['id']))
-
+                con = sqlite3.connect('./medical_history.db')
+                con.row_factory = sqlite3.Row
+                cur = con.cursor()
+                cur.execute("SELECT * FROM medical_encounters WHERE doctor_id = ?", (data[i]['id'],))
+                encounter = cur.fetchall()
+                encounters.append(encounter)
         return render_template("/found_doctors.html", data = data, encounters = encounters)
     else:
         return render_template("/find_doctor.html", doctor_id = session['user_id'])
