@@ -29,7 +29,7 @@ Another essential thing to note is that users can see patients' data even if oth
 The deletion or edition is only allowed for the encounters that the user made.
 
 #### How to run the app on a local machine with Windows OS
-1. Download the folder with all files in your computer.
+1. Download the folder with all files on your computer.
 2. Make sure Python is installed on your computer by typing "Python" in your command line interface (CLI).
 For example, in Git Bash, which is CLI that I installed on my PC, I can type
 ```
