@@ -14,6 +14,7 @@ from helpers import apology, login_required
 # Configure application
 app = Flask(__name__)
 
+# Configure a database
 # Function for a database
 def dict_factory(cursor, row):
     d = {}

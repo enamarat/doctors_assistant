@@ -28,6 +28,41 @@ server-side when the data is already sent to a server. The validation on the ser
 Another essential thing to note is that users can see patients' data even if other users made the records of these patients, but they can not delete or edit such entries.
 The deletion or edition is only allowed for the encounters that the user made.
 
+#### How to run the app on a local machine with Windows OS
+1. Download the folder with all files in your computer.
+2. Make sure Python is installed on your computer by typing "Python" in your command line interface (CLI).
+For example, in Git Bash, which is CLI that I installed on my PC, I can type
+```
+$ Python
+```
+If Python is installed, the CLI will show its version, like
+```
+Python 3.8.6
+```
+3. Navigate to the project folder.
+```
+cd d:/projects/doctors_assistant
+```
+4. In CLI type
+```
+py -3 -m venv venv
+```
+5. Then type
+```
+venv\Scripts\activate
+```
+6. After that we need to install Flask and a few other packages which are necessary to run the app
+```
+pip install Flask
+pip install passlib
+pip install flask-session
+pip install request --user
+```
+7. Finally, you need to type the following two commands **every time** before running the app
+```
+export FLASK_APP=application.py
+python -m flask run
+```
 
-
-
+#### P.S.
+I want to deploy the app on Heroku, but it turns out that it's not recommendable to do so if your app uses SQLite which is my case. I need to switch to PostgreSQL.
