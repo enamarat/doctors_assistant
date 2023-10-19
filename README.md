@@ -1,5 +1,5 @@
 # Doctor's Assistant
-#### Video Demo: https://youtu.be/wAkkCh9gr38
+
 #### Description:
 
 This is a web application built with Flask, SQLite, Bootstrap, and JavaScript. It is designed for medical workers and allows them to create, update and share patients' data.
